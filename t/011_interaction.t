@@ -13,6 +13,38 @@ use Test::Block qw($Plan);
 use File::Find::Repository ; 
 use Directory::Scratch;
 
+my $test_directory_structure =
+	{
+	dir_1 =>
+		{
+		subdir_1 =>{},
+		file_1 =>[],
+		file_a => [],
+		},
+	dir_2 =>
+		{
+		subdir_2 =>
+			{
+			file_22 =>[],
+			file_2a =>[],
+			},
+		file_2 =>[],
+		file_a =>[],
+		file_b =>[],
+		},
+		
+	dir_3 =>
+		{
+		subdir_3 =>{},
+		file_3 =>[],
+		file_a =>[],
+		file_b =>[],
+		file_c =>[],
+		},
+		
+	file_0 => [],
+	} ;
+
 {
 local $Plan = {'INTERACTION' => 12} ;
 
@@ -22,38 +54,7 @@ my $info = sub {push @info_messages, [@_]} ;
 my $warn = sub {push @warn_messages, [@_]} ;
 my $die = sub {push @die_messages, [@_]; die @_} ;
 	
-my $temporary_directory  = 
-	create_directories
-		({
-		dir_1 =>
-			{
-			subdir_1 =>{},
-			file_1 =>[],
-			file_a => [],
-			},
-		dir_2 =>
-			{
-			subdir_2 =>
-				{
-				file_22 =>[],
-				file_2a =>[],
-				},
-			file_2 =>[],
-			file_a =>[],
-			file_b =>[],
-			},
-			
-		dir_3 =>
-			{
-			subdir_3 =>{},
-			file_3 =>[],
-			file_a =>[],
-			file_b =>[],
-			file_c =>[],
-			},
-			
-		file_0 => [],
-		}) ;
+my $temporary_directory  = create_directories($test_directory_structure) ;
 
 my $base = $temporary_directory->base() ;
 
@@ -113,7 +114,43 @@ throws_ok
 	{
 	$locator->Find(FILES => ['file_a'], VERBOSE => 1, AT_FILE => 'some file', AT_LINE => 'some line') ;
 	}  qr~not called in scalar context at 'some file:some line'~, "AT_FILE ok" ;
+
+}
+
+#----------------------------------------------------------------------
+
+{
+local $Plan = {'INTERACTION ERROR' => 1} ;
+
+my $temporary_directory  = create_directories($test_directory_structure) ;
+
+my $base = $temporary_directory->base() ;
+
+my $locator = new File::Find::Repository
+				(
+				NAME            => 'verbose test',
+				VERBOSE         => 1,
+				REPOSITORIES =>["$base"],
+				) ;
+
+use IO::File;
+
+my $current_fh = select ;
+
+my $fh = new IO::File; # not opened
+select $fh ;
+
+throws_ok
+	{
+	warning_is
+		{
+		my $located_file = $locator->Find('file_a') ;
+		}
+		qr/print() on unopened filehandle/, 'unopen filehandle' ;
+	}
+	qr/Can't print!/, 'print failed' ;
 	
+select $current_fh ;
 }
 
 #----------------------------------------------------------------------
@@ -127,38 +164,7 @@ my $info = sub {push @info_messages, [@_]} ;
 my $warn = sub {push @warn_messages, [@_]} ;
 my $die = sub {push @die_messages, [@_]; die @_} ;
 	
-my $temporary_directory  = 
-	create_directories
-		({
-		dir_1 =>
-			{
-			subdir_1 =>{},
-			file_1 =>[],
-			file_a => [],
-			},
-		dir_2 =>
-			{
-			subdir_2 =>
-				{
-				file_22 =>[],
-				file_2a =>[],
-				},
-			file_2 =>[],
-			file_a =>[],
-			file_b =>[],
-			},
-			
-		dir_3 =>
-			{
-			subdir_3 =>{},
-			file_3 =>[],
-			file_a =>[],
-			file_b =>[],
-			file_c =>[],
-			},
-			
-		file_0 => [],
-		}) ;
+my $temporary_directory  = create_directories($test_directory_structure) ;
 
 my $base = $temporary_directory->base() ;
 

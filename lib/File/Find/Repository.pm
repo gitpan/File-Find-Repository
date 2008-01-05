@@ -7,7 +7,7 @@ use warnings ;
 BEGIN 
 {
 use vars qw ($VERSION);
-$VERSION = 0.01;
+$VERSION = 0.02;
 }
 
 #-------------------------------------------------------------------------------
@@ -299,7 +299,7 @@ $object->{VALID_OPTIONS} =
 	} ;
 
 #~ $object->{INTERACTION}{INFO} ||= \&CORE::print ;
-$object->{INTERACTION}{INFO} ||= sub{print @_};
+$object->{INTERACTION}{INFO} ||= sub{print(@_) or croak q{Can't print!}};
 $object->{INTERACTION}{WARN} ||= \&Carp::carp ;
 $object->{INTERACTION}{DIE}  ||= \&Carp::confess ;
 

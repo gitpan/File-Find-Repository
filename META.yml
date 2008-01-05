@@ -1,6 +1,6 @@
 ---
 name: File-Find-Repository
-version: 0.01
+version: 0.02
 author:
   - 'Khemir Nadim ibn Hamouda. <nadim@khemir.net>'
 abstract: Find files in your repositories
@@ -29,8 +29,8 @@ requires:
 provides:
   File::Find::Repository:
     file: lib/File/Find/Repository.pm
-    version: 0.01
-generated_by: Module::Build version 0.2805
+    version: 0.02
+generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2
