@@ -7,7 +7,7 @@ use warnings ;
 BEGIN 
 {
 use vars qw ($VERSION);
-$VERSION = 0.02;
+$VERSION = '0.03';
 }
 
 #-------------------------------------------------------------------------------
@@ -299,7 +299,7 @@ $object->{VALID_OPTIONS} =
 	} ;
 
 #~ $object->{INTERACTION}{INFO} ||= \&CORE::print ;
-$object->{INTERACTION}{INFO} ||= sub{print(@_) or croak q{Can't print!}};
+$object->{INTERACTION}{INFO} ||= sub{print(@_) or croak "Can't print! $!"};
 $object->{INTERACTION}{WARN} ||= \&Carp::carp ;
 $object->{INTERACTION}{DIE}  ||= \&Carp::confess ;
 
@@ -617,11 +617,15 @@ Adds time and size information to the matched file.
 
 my ($object, $file_name, $file) = @_ ;
 
+Readonly my $YEAR_1900 => 1900 ;
+Readonly my $STAT_SIZE => 7 ;
+Readonly my $STAT_CTIME => 10 ;
+
 if($file->{EXISTS})
 	{
-	my ($file_size, undef, undef, $modification_time) = (stat($file->{FOUND_AT}))[7..10];
+	my ($file_size, undef, undef, $modification_time) = (stat($file->{FOUND_AT}))[$STAT_SIZE..$STAT_CTIME];
 	my ($sec, $min, $hour, $month_day, $month, $year, $week_day, $year_day) = gmtime($modification_time) ;
-	$year += 1900 ;
+	$year += $YEAR_1900 ;
 	$month++ ;
 
 	$file->{SIZE} = $file_size ;
